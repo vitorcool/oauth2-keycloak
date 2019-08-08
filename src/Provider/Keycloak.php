@@ -105,6 +105,16 @@ class Keycloak extends AbstractProvider
     {
         return $this->getBaseUrlWithRealm().'/protocol/openid-connect/auth';
     }
+    
+     /**
+     * Get defined redirect Uri to send auth code
+     *
+     * @return string
+     */
+    public function getRedirectUri()
+    {
+        return $this->redirectUri;
+    }
 
     /**
      * Get access token url to retrieve token
