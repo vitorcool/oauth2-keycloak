@@ -154,6 +154,10 @@ class Keycloak extends AbstractProvider
         return $this->appendQuery($base, $query);
     }
 
+    public function getJwksUrl()
+    {
+        return $this->getBaseUrlWithRealm().'/protocol/openid-connect/certs';
+    }
     /**
      * Get logout url to logout of session token
      *
@@ -201,6 +205,19 @@ class Keycloak extends AbstractProvider
             $error = $data['error'].': '.$data['error_description'];
             throw new IdentityProviderException($error, 0, $data);
         }
+    }
+
+    public function getJwtKeys($kid=null){
+        $url=$this->getJwksUrl();
+        $request= $this->getRequest("GET",$url);
+        $response= $this->getParsedResponse($request);
+        $response=$response['keys']??[];
+        if(!empty($kid)){
+            $response=array_filter($response,function($key) use($kid){
+               return $key['kid']==$kid;
+            });
+        }
+        return $response;
     }
 
     /**
@@ -285,5 +302,13 @@ class Keycloak extends AbstractProvider
     public function usesEncryption()
     {
         return (bool) $this->encryptionAlgorithm && $this->encryptionKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientId()
+    {
+        return $this->clientId;
     }
 }
